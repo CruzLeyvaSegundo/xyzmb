@@ -1,6 +1,11 @@
 eclipse.preferences.version=1
+encoding//src/main/java/tmoBotsAutomation/botTmoGetContentMangas.java=UTF-8
 encoding//src/main/java/tmoBotsAutomation/botTmoHomeUpdate.java=UTF-8
 encoding//src/main/java/tmoBotsAutomation/botTmoImportBiblioteca.java=UTF-8
 encoding//src/main/java/tmoBotsAutomation/tstApi.java=UTF-8
-encoding//src/main/java/webTmo/WebBibliotecaTmo.java=UTF-8
-encoding//src/main/java/webTmo/WebHomeTmo.java=UTF-8
+encoding//src/main/java/webServicesTMO/WebBibliotecaTmo.java=UTF-8
+encoding//src/main/java/webServicesTMO/WebContentMangaTmo.java=UTF-8
+encoding//src/main/java/webServicesTMO/WebHomeTmo.java=UTF-8
+encoding//src/main/java/webServicesTMO/WebServicesTmo.java=UTF-8
+encoding//src/main/java/webTmo/Capitulo.java=UTF-8
+encoding//src/main/java/webTmo/ContentManga.java=UTF-8

@@ -1,38 +1,36 @@
-package webTmo;
+package webServicesTMO;
 
-import java.util.List;
+//import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import webServicesTMO.StatusMangaRequest;
-import webServicesTMO.StatusMangaResponse;
-import webServicesTMO.WebServicesTmo;
+import webTmo.StatusManga;
 
 public class UpdateManga {
 	
 	private String keyManga;
-	private String tipo;
+	private String tipoManga;
 	private String title;
 	private String nroCap;
 	private String urlManga;
 	private String urlLector;
 	private String mas18;
 	private String urlPortada;
-	private String status = "-";
-	private String revision = "-";
+	private String statusManga = "-";
+	private String revisionManga = "-";
 	
 	private Retrofit retrofit;
 	private WebServicesTmo webServiceTmo;
-	private List<StatusManga> statusMangaResponse;
+	private StatusManga statusMangaResponse;
 	private int error;
 	
 	public UpdateManga(String keyManga, String tipo, String nroCap, String urlManga, String urlLector,
 			String mas18) {
 		this.keyManga = keyManga;
-		this.tipo = tipo;
+		this.tipoManga = tipo;
 		this.nroCap = nroCap;
 		this.urlManga = urlManga;
 		this.urlLector = urlLector;
@@ -84,12 +82,12 @@ public class UpdateManga {
 		this.nroCap = nroCap;
 	}
 	
-	public String getTipo() {
-		return tipo;
+	public String getTipoManga() {
+		return tipoManga;
 	}
 	
-	public void setTipo(String tipo) {
-		this.tipo = tipo;
+	public void setTipoManga(String tipo) {
+		this.tipoManga = tipo;
 	}
 	
 	public String getMas18() {
@@ -108,20 +106,20 @@ public class UpdateManga {
 		this.urlPortada = urlPortada;
 	}
 
-	public String getStatus() {
-		return status;
+	public String getStatusManga() {
+		return statusManga;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
+	public void setStatusManga(String status) {
+		this.statusManga = status;
 	}
 
-	public String getRevision() {
-		return revision;
+	public String getRevisionManga() {
+		return revisionManga;
 	}
 
-	public void setRevision(String revision) {
-		this.revision = revision;
+	public void setRevisionManga(String revision) {
+		this.revisionManga = revision;
 	}
 	
 	public void sleep(double timeS) {
@@ -137,18 +135,18 @@ public class UpdateManga {
 	private void getStatusManga(String keyManga) {
 		//Testing metodo POST con retrofit
 		error=0;
-		if(statusMangaResponse!=null)
-			statusMangaResponse.clear();
-		Call<StatusMangaResponse> statusMangaCallPost = webServiceTmo.getItemStatusManga(keyManga);
-		statusMangaCallPost.enqueue(new Callback<StatusMangaResponse>(){
-			public void onFailure(Call<StatusMangaResponse> call, Throwable t) {
+		statusMangaResponse=null;
+		Call<StatusManga> statusMangaCallPost = webServiceTmo.getItemStatusManga(keyManga);
+		statusMangaCallPost.enqueue(new Callback<StatusManga>(){
+			public void onFailure(Call<StatusManga> call, Throwable t) {
 				// TODO Auto-generated method stub
 				error=1;
 				System.out.println("error api:"+t);
 			}
-			public void onResponse(Call<StatusMangaResponse> call, Response<StatusMangaResponse> response) {
+			public void onResponse(Call<StatusManga> call, Response<StatusManga> response) {
 				// TODO Auto-generated method stub
-				statusMangaResponse = response.body().getItems();
+				statusMangaResponse=new StatusManga();
+				statusMangaResponse = response.body();
 				
 				System.out.println("CONSULT QUERY CORRECT!!!");	
 			}
@@ -161,6 +159,7 @@ public class UpdateManga {
 		for(int i=0;i<5 && stop==0 ;i++)//Para descartar problemas de red
 		{
 			getStatusManga(this.keyManga);
+			int t=0;
 			while(true) { //Bucle para depurar respuesta de la api
 				if(error==1)//Hubo un error con la api
 				{
@@ -168,16 +167,23 @@ public class UpdateManga {
 					break;
 				}
 				else if(statusMangaResponse==null)//La respuesta no llega todavia pero no hay error con la api
+				{			
 					sleep(0.2);//Se espera 0.5 segundos
+					System.out.println("ESPERANDO...........   "+(t*0.2)+ "   SEGUNDOS");
+					t++;
+				}
 				else //La respuesta fue recibida correctamente
 				{
-					if(statusMangaResponse.size()==0)//El manga no existe por lo tanto sera añadido
+					if(statusMangaResponse.isNull())//El manga no existe por lo tanto sera añadido ********
 					{
+						//Codigo que añade el manga mediante un post.....
 						System.out.println("EL MANGA NO EXISTE, AGREGANDO A LA LISTA DE MANGAS....");
 					}
 					else //El manga existe y se debe ver si se actualizara la lista de capitulos publicados
 					{
-						System.out.println("\nTituloOriginal: "+statusMangaResponse.get(0).getTitulo());
+						//Para actualizar capitulos de un manga crear un metodo en ContentManga
+						//Previo se verifica es status del manga si es "ok" o "ban"
+						System.out.println("\nTituloOriginal: "+statusMangaResponse.getTituloManga());
 						System.out.println("ACTUALIZANDO CAPITULOS....");
 					}	
 					stop=1;

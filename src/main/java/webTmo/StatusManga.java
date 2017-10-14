@@ -2,111 +2,126 @@ package webTmo;
 
 public class StatusManga {
 	
-	private String urlKeyManga;
-	private String revision;
-	private String tipo;
-	private String titulo;	
+	private String keyManga;
+	private String revisionManga;
+	private String tipoManga;
+	private String tituloManga;	
 	private String urlPortada;
 	private String urlManga;	
-	private String rating;
-	private String mas18;
-	private String status;
+	private String ratingManga;
+	private String esMas18;
+	private String statusManga;
 	
 	public StatusManga() {}
 	
-	public StatusManga(String urlKeyManga, String revision, String tipo, String titulo, String urlPortada,
-			String urlManga, String rating, String mas18, String status) {
-		this.urlKeyManga = urlKeyManga;
-		this.revision = revision;
-		this.tipo = tipo;
-		this.titulo = titulo;
+	public StatusManga(String keyManga, String revisionManga, String tipoManga, String tituloManga, String urlPortada,
+			String urlManga, String ratingManga, String esMas18, String statusManga) {
+		this.keyManga = keyManga;
+		this.revisionManga = revisionManga;
+		this.tipoManga = tipoManga;
+		this.tituloManga = tituloManga;
 		this.urlPortada = urlPortada;
 		this.urlManga = urlManga;
-		this.rating = rating;
-		this.mas18 = mas18;
-		this.status = status;
+		this.ratingManga = ratingManga;
+		this.esMas18 = esMas18;
+		this.statusManga = statusManga;
+	}
+	
+	public String getKeyManga() {
+		return keyManga;
 	}
 
+	public void setKeyManga(String keyManga) {
+		this.keyManga = keyManga;
+	}
 
-	public String getTipo() {
-		return tipo;
+	public String getRevisionManga() {
+		return revisionManga;
 	}
-	
-	public void setTipo(String tipo) {
-		this.tipo = tipo;
+
+	public void setRevisionManga(String revisionManga) {
+		this.revisionManga = revisionManga;
 	}
-	
-	public String getRating() {
-		return rating;
+
+	public String getTipoManga() {
+		return tipoManga;
 	}
-	
-	public void setRating(String rating) {
-		this.rating = rating;
+
+	public void setTipoManga(String tipoManga) {
+		this.tipoManga = tipoManga;
 	}
-		
+
+	public String getTituloManga() {
+		return tituloManga;
+	}
+
+	public void setTituloManga(String tituloManga) {
+		this.tituloManga = tituloManga;
+	}
+
 	public String getUrlPortada() {
 		return urlPortada;
 	}
-	
+
 	public void setUrlPortada(String urlPortada) {
 		this.urlPortada = urlPortada;
 	}
-	
+
 	public String getUrlManga() {
 		return urlManga;
 	}
-	
+
 	public void setUrlManga(String urlManga) {
 		this.urlManga = urlManga;
 	}
+
+	public String getRatingManga() {
+		return ratingManga;
+	}
+
+	public void setRatingManga(String ratingManga) {
+		this.ratingManga = ratingManga;
+	}
+
+	public String getEsMas18() {
+		return esMas18;
+	}
+
+	public void setEsMas18(String esMas18) {
+		this.esMas18 = esMas18;
+	}
+
+	public String getStatusManga() {
+		return statusManga;
+	}
+
+	public void setStatusManga(String statusManga) {
+		this.statusManga = statusManga;
+	}
 	
-	public String getTitulo() {
-		return titulo;
-	}
-	
-	public void setTitulo(String titulo) {
-		this.titulo = titulo;
-	}
-	
-	public String getUrlKeyManga() {
-		return urlKeyManga;
-	}
-	
-	public void setUrlKeyManga(String urlKeyManga) {
-		this.urlKeyManga = urlKeyManga;
-	}
-
-	public String getRevision() {
-		return revision;
-	}
-
-	public void setRevision(String revision) {
-		this.revision = revision;
-	}
-
-	public String getMas18() {
-		return mas18;
-	}
-
-	public void setMas18(String mas18) {
-		this.mas18 = mas18;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
+	//Si se instancia el objeto con 'null' y despues se invoca este metodo generar error
+	public boolean isNull() //Usar este metodo solo cuando la solicitud Request GET fue un exito
+	{
+		return(	this.keyManga==null &&
+				this.revisionManga==null &&
+				this.tipoManga==null &&
+				this.tituloManga==null &&
+				this.urlPortada==null &&
+				this.urlManga==null &&
+				this.ratingManga==null &&
+				this.esMas18==null &&
+				this.statusManga==null);
 	}
 	
 	public void printStatusManga() {
-		System.out.println("\nkeyManga: "+getUrlKeyManga() + 
-				"\nTitulo: "+getTitulo() + 
-				"\nurlManga: "+getUrlManga() +
-				"\ntipo: "+getTipo() + 
-				"\nPortada: "+getUrlPortada() + 
-				"\nRating: "+getRating() +
-				"\nmas18: "+getMas18() + "\n");
+		System.out.println("\nkeyManga: "+this.getKeyManga()+ 
+				"\nTituloManga: "+ this.getTituloManga()+ 
+				"\nurlManga: "+ this.getUrlManga() +
+				"\ntipoManga: "+ this.getTipoManga() + 
+				"\nPortadaUrl: "+ this.getUrlPortada()+ 
+				"\nRatingManga: "+ this.getRatingManga()+
+				"\nStatusManga: "+ this.getStatusManga()+
+				"\nRevisionManga: "+ this.getRevisionManga()+
+				"\nesMas18: "+ this.getEsMas18()+ "\n");
 	}
 }

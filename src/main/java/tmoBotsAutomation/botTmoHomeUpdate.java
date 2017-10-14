@@ -1,6 +1,6 @@
 package tmoBotsAutomation;
 
-import webTmo.WebHomeTmo;
+import webServicesTMO.WebHomeTmo;
 
 public class botTmoHomeUpdate {
 

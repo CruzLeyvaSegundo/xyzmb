@@ -1,6 +1,6 @@
 package tmoBotsAutomation;
 
-import webTmo.WebBibliotecaTmo;
+import webServicesTMO.WebBibliotecaTmo;
 
 public class botTmoImportBiblioteca {
 

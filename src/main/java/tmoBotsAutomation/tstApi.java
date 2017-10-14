@@ -1,17 +1,18 @@
 package tmoBotsAutomation;
 
+import java.lang.reflect.Type;
+//import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import webServicesTMO.StatusMangaRequest;
-import webServicesTMO.StatusMangaResponse;
 import webServicesTMO.WebServicesTmo;
 import webTmo.*;
 
@@ -20,18 +21,31 @@ public class tstApi {
 	public static void main(String[] args) {
 		
 		//Test parsing json simple response
-		String jsonText1 = "{ " +
-							  "\"tipo\" : \"manga\", "+
-							  " \"rating\": \"8.5\", "+
-							  " \"status\": \"ok\", "+
+		String jsonText1 = "[{ " +
+							  " \"tipoManga\" : \"manga\", "+
+							  " \"ratingManga\": \"8.5\", "+
+							  " \"statusManga\": \"ok\", "+
 							  " \"urlPortada\": \"xdxdxd\", "+
 							  " \"urlManga\": \"https://www.tumangaonline.com/biblioteca/mangas/20575/Kami-no-unmei\", "+
-							  " \"titulo\": \"Kami no unmei\", "+
-							  " \"urlKeyManga\": \"2\""+
-						    "}";
+							  " \"tituloManga\": \"Kami no unmei\", "+
+							  " \"keyManga\": \"2\", "+
+							  " \"revisionManga\": \"-\","+
+							  " \"esMas18\": \"no\""+
+						    "},"+
+						    "{"+
+							  " \"tipoManga\" : \"manga\", "+
+							  " \"ratingManga\": \"8.5\", "+
+							  " \"statusManga\": \"ok\", "+
+							  " \"urlPortada\": \"xdxdxd\", "+
+							  " \"urlManga\": \"https://www.tumangaonline.com/biblioteca/mangas/20575/Kami-no-unmei\", "+
+							  " \"tituloManga\": \"pacmon\", "+
+							  " \"keyManga\": \"1\", "+
+							  " \"revisionManga\": \"-\","+
+							  " \"esMas18\": \"no\""+
+						    "}]";
 				
 		//Test parsing json with list of object response
-		String jsonText2 = "{" + 
+		/*String jsonText2 = "{" + 
 				  "\"autor\": \"Tetsuya Imai\", "+ 
 				  "\"tstField\": \"xdxdd\", "+ 
 				  "\"capitulos\": "+
@@ -46,25 +60,33 @@ public class tstApi {
 				  		"}"+ 
 				  	"] "+
 				"}";
-		
+		*/
 		//									TESTING AREA
 		
-		// JsonText1 test
+
+		///argumento 'Type' en lugar de 'class' para fromJson al trabajar con lista de objetos
+		Type listStatusManga = new TypeToken<List<StatusManga>>(){}.getType();
+		
 		Gson gson = new GsonBuilder().create();
-		StatusManga tmoMangaStatus = gson.fromJson(jsonText1, StatusManga.class);
-		System.out.println("tipo: " +tmoMangaStatus.getTipo() + "\ntitulo: " + tmoMangaStatus.getTitulo());
+		List<StatusManga> tmoMangaStatus = gson.fromJson(jsonText1,listStatusManga);
+		for (StatusManga e : tmoMangaStatus) {
+			//System.out.println(((LinkedTreeMap<String,String>)e).get("tipoManga"));
+			e.printStatusManga();
+		}
+		//System.out.println("tipo: " +tmoMangaStatus.getTipoManga() + "\ntitulo: " + tmoMangaStatus.getTituloManga());
 		
 		// JsonText2 test
-		ContentManga contentManga = gson.fromJson(jsonText2, ContentManga.class);
+		/*ContentManga contentManga = gson.fromJson(jsonText2, ContentManga.class);
 		System.out.println("\nautor: " +contentManga.getAutor() + "\ncapitulo( nro: " +
 				contentManga.getCapitulos().get(0).getNroCap() +" , descripcion: "+
 				contentManga.getCapitulos().get(0).getDescripcionCap()+ " )\n"+
 							"capitulo( nro: " +contentManga.getCapitulos().get(1).getNroCap() +
-							" , descripcion: "+contentManga.getCapitulos().get(1).getDescripcionCap()+ " )");
-		
+							" , descripcion: "+contentManga.getCapitulos().get(1).getDescripcionCap()+ " )");*/
+		System.out.println("\n					FIN TESTING MANUAL-------------- EMPIEZA TESTING API\n");
 		//------------------------------------------------------------------------------------------------
 		//							Consumiendo recursos de una api de aws
 		//------------------------------------------------------------------------------------------------
+		
 		Retrofit retrofit= new Retrofit.Builder()
 				.baseUrl("https://c24tvlmm7k.execute-api.us-east-1.amazonaws.com/dev/")
 				.addConverterFactory(GsonConverterFactory.create())
@@ -73,42 +95,50 @@ public class tstApi {
 		
 		
 		//Testing metodo GET con retrofit
-		Call<StatusMangaResponse> statusMangaCallGET = webServiceTmo.getItemStatusManga("1");
-		statusMangaCallGET.enqueue(new Callback<StatusMangaResponse>(){
-			public void onFailure(Call<StatusMangaResponse> call, Throwable t) {
+		//Call<StatusManga> statusMangaCallGET = webServiceTmo.getItemStatusManga("manhwas_31155_THE-STRANGE-STORY-OF-A-GU");
+		Call<List<StatusManga>> statusMangaCallGET = webServiceTmo.getStatusMangas();
+		statusMangaCallGET.enqueue(new Callback<List<StatusManga> >(){
+			public void onFailure(Call<List<StatusManga> > call, Throwable t) {
 				// TODO Auto-generated method stub
-				System.out.println("error al consumir la api");
+				System.out.println("error al consumir la api: "+ t);
 			}
-			public void onResponse(Call<StatusMangaResponse> call, Response<StatusMangaResponse> response) {
-				// TODO Auto-generated method stub
-				List<StatusManga> statusMangaResponse = response.body().getItems();
-				
-				if(statusMangaResponse.size()==0)
-					System.out.println("Lista vacia devuelto");
-				for (StatusManga e : statusMangaResponse) {
-					System.out.println("\nurlKeyManga: "+e.getUrlKeyManga() + "\ntipo: "+e.getTipo()+
-							"\nTitulo: "+e.getTitulo()+"\nurlManga: "+e.getUrlManga()+"\nurlPortada: "+
-							e.getUrlPortada()+"\nRating: "+e.getRating()+"\nRevision: "+e.getRevision()+
-							"\nStatus: "+e.getStatus()+"\nmas18: "+e.getMas18());
+			public void onResponse(Call<List<StatusManga> > call, Response<List<StatusManga> > response) {
+
+				List<StatusManga> mangaResponse = response.body(); 
+					//mangaResponse.printStatusManga();
+				/*if(statusMangaResponse.size()==0)
+					System.out.println("Respuesta vacia devuelta: OBJETO NO ENCONTRADO");*/
+				for (StatusManga e : mangaResponse) {
+					e.printStatusManga();
 				}
+				System.out.println("Objetos devuelto: "+mangaResponse.size());
 			}		
 		});	
-		System.out.println("FIN");
-		
+		//ContentManga reqStatus = new ContentManga();
+		//System.out.println("Texto validado: "+reqStatus.validarTexto("ass\"s"));
+		/*
+		System.out.println("POST REQUEST" );
 		//Testing metodo POST con retrofit
-		StatusMangaRequest reqStatus = new StatusMangaRequest("tmoMangaStatus",new StatusManga(
-				"4","no","manga","BEARĀ NO MICHI - ベアラーの道","http://xdxd.com","http://xdxd.com","7.9","no","emision"));
-		Call<StatusMangaRequest> statusMangaCallPost = webServiceTmo.setStatusManga(reqStatus);
-		statusMangaCallPost.enqueue(new Callback<StatusMangaRequest>(){
-			public void onFailure(Call<StatusMangaRequest> call, Throwable t) {
+		List<String> li = new ArrayList<String>();
+		li.add("terror");li.add("suspenso");
+		List<Capitulo> lc = new ArrayList<Capitulo>();
+		lc.add(new Capitulo(1,"1.00","lolxD"));lc.add(new Capitulo(2,"2.00","pacmon"));
+		ContentManga reqStatus = new ContentManga(
+				"5","tumangaonline","manga","BEARĀ NO MICHI - ベアラーの道","El papu","holi",li,lc,"emision",
+				"12-08-2015","mensual","http://xdxd.com","http://xdxd.com","79","8.5","no");
+		System.out.println(gson.toJson(reqStatus));	
+		Call<ContentManga> statusMangaCallPost = webServiceTmo.setContentManga(reqStatus);
+		statusMangaCallPost.enqueue(new Callback<ContentManga>(){
+			public void onFailure(Call<ContentManga> call, Throwable t) {
 				// TODO Auto-generated method stub
-				System.out.println("error al consumir la api");
+				System.out.println("error al consumir la api" + t );
 			}
-			public void onResponse(Call<StatusMangaRequest> call, Response<StatusMangaRequest> response) {
+			public void onResponse(Call<ContentManga> call, Response<ContentManga> response) {
 				// TODO Auto-generated method stub
 					System.out.println("Testing completo");	
 			}
 		});	
+		System.out.println("FINAL POST REQUEST" );*/
 	}
 
 }
