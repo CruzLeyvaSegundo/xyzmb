@@ -263,4 +263,27 @@ public class ContentManga {
 			s.quickSortCaps(this.capitulosManga,0,this.capitulosManga.size()-1);
 		}
 	}	
+	public void addGenero(String genero) {
+		if(this.generos==null)
+			this.generos = new ArrayList<String>();
+		this.generos.add(genero);
+	}
+	public boolean isExistBanGeneros() {
+		if(this.generos.isEmpty())
+			return false;
+		for(String g : this.generos) {
+			if(g.contains("Yaoi")|| g.contains("Yuri"))
+				return true;
+		}
+		return false;
+	}	
+	public boolean isExistGeneroGenderBender() {
+		if(this.generos.isEmpty())
+			return false;
+		for(String g : this.generos) {
+			if(g.contains("Gender")|| g.contains("Bender"))
+				return true;
+		}
+		return false;
+	}	
 }
