@@ -88,4 +88,29 @@ public class SupportMethods {
         	System.out.println("error sleep");
         }
 	}
+	public String validateText(String text) {
+		String result="";
+		int size = text.length();
+		for(int i=0;i<size;i++)
+		{
+			char c=text.charAt(i);
+			if(c=='\"')
+				result+="\\\"";
+			else if(c=='\'')
+				result+="\\\'";
+			else if(c=='á' || c=='à')
+				result+='a';
+			else if(c=='é' || c=='è')
+				result+='e';
+			else if(c=='í' || c=='ì')
+				result+='i';
+			else if(c=='ó' || c=='ò')
+				result+='o';
+			else if(c=='ú' || c=='ù')		
+				result+='u';
+			else
+				result+=c;
+		}			
+		return result;
+	}
 }

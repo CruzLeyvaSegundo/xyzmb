@@ -11,11 +11,11 @@ public class StatusManga {
 	private String ratingManga;
 	private String esMas18;
 	private String statusManga;
-	
+	private String page;
 	public StatusManga() {}
-	
+
 	public StatusManga(String keyManga, String revisionManga, String tipoManga, String tituloManga, String urlPortada,
-			String urlManga, String ratingManga, String esMas18, String statusManga) {
+			String urlManga, String ratingManga, String esMas18, String statusManga, String page) {
 		this.keyManga = keyManga;
 		this.revisionManga = revisionManga;
 		this.tipoManga = tipoManga;
@@ -25,6 +25,7 @@ public class StatusManga {
 		this.ratingManga = ratingManga;
 		this.esMas18 = esMas18;
 		this.statusManga = statusManga;
+		this.page = page;
 	}
 	
 	public String getKeyManga() {
@@ -122,6 +123,15 @@ public class StatusManga {
 				"\nRatingManga: "+ this.getRatingManga()+
 				"\nStatusManga: "+ this.getStatusManga()+
 				"\nRevisionManga: "+ this.getRevisionManga()+
-				"\nesMas18: "+ this.getEsMas18()+ "\n");
+				"\nesMas18: "+ this.getEsMas18()+
+				"\nPage: "+ this.getPage()+"\n");
+	}
+
+	public String getPage() {
+		return page;
+	}
+
+	public void setPage(String page) {
+		this.page = page;
 	}
 }

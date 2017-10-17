@@ -22,6 +22,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import supportClass.SupportMethods;
+import webTmo.DataManga;
 import webTmo.StatusManga;
 
 public class WebBibliotecaTmo {
@@ -29,6 +31,7 @@ public class WebBibliotecaTmo {
 	private WebDriver driver;
 	private Retrofit retrofit;
 	private WebServicesTmo webServiceTmo;
+	private SupportMethods support;
 	
 	public WebBibliotecaTmo() {
 		// Se instancia la ubicacion de geckodriver
@@ -40,6 +43,7 @@ public class WebBibliotecaTmo {
 					.addConverterFactory(GsonConverterFactory.create())
 					.build();
 		webServiceTmo = retrofit.create(WebServicesTmo.class);
+		support = new SupportMethods();
 	}
 	
 	public void writeTextFile(String text,String ruta) {
@@ -175,18 +179,19 @@ public class WebBibliotecaTmo {
 			}
 		});		
 	}
-	public String validateText(String text) {
-		String result="";
-		int size = text.length();
-		for(int i=0;i<size;i++)
-		{
-			char c=text.charAt(i);
-			if(c=='\"')
-				result+="\\\"";
-			else
-				result+=c;
-		}			
-		return result;
+	private void insertDataValue(DataManga reqStatus) {
+		//Testing metodo POST con retrofit
+		Call<DataManga> statusMangaCallPost = webServiceTmo.setDataValue(reqStatus);
+		statusMangaCallPost.enqueue(new Callback<DataManga>(){
+			public void onFailure(Call<DataManga> call, Throwable t) {
+				// TODO Auto-generated method stub
+				System.out.println("error al consumir la api");
+			}
+			public void onResponse(Call<DataManga> call, Response<DataManga> response) {
+				// TODO Auto-generated method stub
+					System.out.println("INSERT CORRECT!!");	
+			}
+		});		
 	}
 	public void getMangasBiblioteca() {
 
@@ -195,7 +200,9 @@ public class WebBibliotecaTmo {
              
         //Ordenamos las entradas de la biblioteca de mangas
         orderBibliotecaManga();
-        
+        int page=1;
+        int countMangasPage=0;
+        int nroMangas=0;
 		while(true){
 			int umbralErrMax = 0;
 			for(int i = 1;i<=20 ; i++) {		
@@ -213,9 +220,9 @@ public class WebBibliotecaTmo {
 						WebElement eRating = driver.findElement(By.xpath(xPathRating));
 						WebElement ePortada = driver.findElement(By.xpath(xPathPortada));
 						
-						String title = validateText(eTitle.getText());
+						String title = support.validateText(eTitle.getText()).toLowerCase();
 						String urlManga = eTitle.getAttribute("href");
-						String keyManga=(urlManga.substring(41,urlManga.length())).replace('/', '_');
+						String keyManga=(urlManga.substring(41,urlManga.length())).replace('/', '_').toLowerCase();
 						String tipo = eTipo.getText();
 						String rating = eRating.getText();
 						String portada = ePortada.getAttribute("bn-lazy-src");
@@ -229,11 +236,20 @@ public class WebBibliotecaTmo {
 						}				
 						sleep(0.4);
 						StatusManga statusManga = new StatusManga(keyManga,"no",tipo,title,portada,
-																	urlManga,rating,mas18,"-");
-						statusManga.printStatusManga();
-						insertStatusManga(statusManga);   
-						if(portada!=null && rating!=null && tipo!=null)
+																	urlManga,rating,mas18,"-",String.valueOf(page));
+						if((portada!=null || portada!="") && (title!=null || title !="") && (tipo!=null || tipo!="")
+								&&!(keyManga.contains("manga.nombreUrl%7D%7D")||tipo.contains("manga.tipo")))
+						{
+							statusManga.printStatusManga();
+							insertStatusManga(statusManga); 
+							countMangasPage++;
+							nroMangas++;
+							if(countMangasPage==100) {
+								page++;
+								countMangasPage=0;
+							}
 							break;
+						}
 						else
 						{
 							System.out.println("\n         REPITIENDO LECTURA...");
@@ -245,7 +261,10 @@ public class WebBibliotecaTmo {
 						umbralErrMax++;
 						sleep(2);
 						if(k==10)
+						{
+							insertDataValue(new DataManga("importBibliotecaStatus","error"));
 							System.out.println("Revisa la pagina tumangaonline.com por posibles problemas externos");
+						}
 					}
 				}
 				if(umbralErrMax>=30)
@@ -257,6 +276,10 @@ public class WebBibliotecaTmo {
 				break;
 			sleep(8);
 		}
+		//Insert DataSystem NroMangas
+		insertDataValue(new DataManga("nroMangasTmo",String.valueOf(nroMangas)));
+		insertDataValue(new DataManga("nroPaginasTmo",String.valueOf(page)));
+		insertDataValue(new DataManga("importBibliotecaStatus","Finish"));
 		closeBiblioteca();
 		apagarPC();
 		

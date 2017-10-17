@@ -7,6 +7,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import webTmo.ContentManga;
+import webTmo.DataManga;
 import webTmo.StatusManga;
 
 public interface WebServicesTmo {
@@ -30,4 +31,7 @@ public interface WebServicesTmo {
 	
 	@POST("mangas")
 	Call<ContentManga> setContentManga(@Body ContentManga request);
+	
+	@POST("mangas")
+	Call<DataManga> setDataValue(@Body DataManga request);
 }

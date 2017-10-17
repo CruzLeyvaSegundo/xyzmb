@@ -96,7 +96,7 @@ public class tstApi {
 		
 		//Testing metodo GET con retrofit
 		//Call<StatusManga> statusMangaCallGET = webServiceTmo.getItemStatusManga("manhwas_31155_THE-STRANGE-STORY-OF-A-GU");
-		Call<List<StatusManga>> statusMangaCallGET = webServiceTmo.getStatusMangas();
+		/*Call<List<StatusManga>> statusMangaCallGET = webServiceTmo.getStatusMangas();
 		statusMangaCallGET.enqueue(new Callback<List<StatusManga> >(){
 			public void onFailure(Call<List<StatusManga> > call, Throwable t) {
 				// TODO Auto-generated method stub
@@ -107,38 +107,39 @@ public class tstApi {
 				List<StatusManga> mangaResponse = response.body(); 
 					//mangaResponse.printStatusManga();
 				/*if(statusMangaResponse.size()==0)
-					System.out.println("Respuesta vacia devuelta: OBJETO NO ENCONTRADO");*/
+					System.out.println("Respuesta vacia devuelta: OBJETO NO ENCONTRADO");
 				for (StatusManga e : mangaResponse) {
 					e.printStatusManga();
 				}
 				System.out.println("Objetos devuelto: "+mangaResponse.size());
 			}		
-		});	
+		});	*/
 		//ContentManga reqStatus = new ContentManga();
 		//System.out.println("Texto validado: "+reqStatus.validarTexto("ass\"s"));
-		/*
+		
 		System.out.println("POST REQUEST" );
 		//Testing metodo POST con retrofit
-		List<String> li = new ArrayList<String>();
-		li.add("terror");li.add("suspenso");
-		List<Capitulo> lc = new ArrayList<Capitulo>();
-		lc.add(new Capitulo(1,"1.00","lolxD"));lc.add(new Capitulo(2,"2.00","pacmon"));
-		ContentManga reqStatus = new ContentManga(
+		//List<String> li = new ArrayList<String>();
+		//li.add("terror");li.add("suspenso");
+		//List<Capitulo> lc = new ArrayList<Capitulo>();
+		//lc.add(new Capitulo(1,"1.00","lolxD"));lc.add(new Capitulo(2,"2.00","pacmon"));
+		/*ContentManga reqStatus = new ContentManga(
 				"5","tumangaonline","manga","BEARĀ NO MICHI - ベアラーの道","El papu","holi",li,lc,"emision",
 				"12-08-2015","mensual","http://xdxd.com","http://xdxd.com","79","8.5","no");
-		System.out.println(gson.toJson(reqStatus));	
-		Call<ContentManga> statusMangaCallPost = webServiceTmo.setContentManga(reqStatus);
-		statusMangaCallPost.enqueue(new Callback<ContentManga>(){
-			public void onFailure(Call<ContentManga> call, Throwable t) {
+		System.out.println(gson.toJson(reqStatus));	*/
+		StatusManga status = new StatusManga("1","no","manga","one piece","xd0","xd","8.5","no","ok","1");;
+		Call<StatusManga> statusMangaCallPost = webServiceTmo.setStatusManga(status);
+		statusMangaCallPost.enqueue(new Callback<StatusManga>(){
+			public void onFailure(Call<StatusManga> call, Throwable t) {
 				// TODO Auto-generated method stub
 				System.out.println("error al consumir la api" + t );
 			}
-			public void onResponse(Call<ContentManga> call, Response<ContentManga> response) {
+			public void onResponse(Call<StatusManga> call, Response<StatusManga> response) {
 				// TODO Auto-generated method stub
 					System.out.println("Testing completo");	
 			}
 		});	
-		System.out.println("FINAL POST REQUEST" );*/
+		System.out.println("FINAL POST REQUEST" );
 	}
 
 }

@@ -12,7 +12,7 @@ public class botTmoGetContentMangas {
 		WebContentMangaTmo webContentManga = new WebContentMangaTmo();       
    
         // Comenta el titulo de la pagina visatada
-        System.out.println("Page title is: " + webContentManga.getTitle());
+        //System.out.println("Page title is: " + webContentManga.getTitle());
         
         //Se almacena el html de la pagina visitada en un archivo .txt
        /* System.out.println("Guardando html en un archivo...");

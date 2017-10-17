@@ -1,17 +1,11 @@
 package webServicesTMO;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.swing.JOptionPane;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -34,18 +28,19 @@ public class WebContentMangaTmo {
 	private WebDriver driver;
 	private Retrofit retrofit;
 	private WebServicesTmo webServiceTmo;
-	
+	private List<StatusManga> listStatusMangaResponse;
+	private int errorGetListStatusManga;
 	public WebContentMangaTmo(){
 		// Se instancia la ubicacion de geckodriver
 		System.setProperty("webdriver.gecko.driver", "browsers//geckodriver.exe");
 		this.driver =  new FirefoxDriver();
-		driver.get("https://www.tumangaonline.com/biblioteca/mangas/10457/Black-Clover");
 		retrofit= new Retrofit.Builder()
 					.baseUrl("https://c24tvlmm7k.execute-api.us-east-1.amazonaws.com/dev/")
 					.addConverterFactory(GsonConverterFactory.create())
 					.build();
 		webServiceTmo = retrofit.create(WebServicesTmo.class);
 		support = new SupportMethods();
+		errorGetListStatusManga=0;
 	}
 	
 	public WebDriver getDriver() {
@@ -62,64 +57,40 @@ public class WebContentMangaTmo {
 	public String getHtmlContent() {
 		return driver.getPageSource().toString();
 	}
-	
 
-	
-	
-
-	
-
-
-
-
-
-	private String urlPortada;
-	private String esMas18;
-	private String rakingManga;//Puesto de popularidad del manga con respecto a los demas
-	private String ratingManga;
 	public String createXpathElement(int op) {
-		String result="//*[@id=\"page-content\"]/div/div[2]/div[2]/div[2]/div[2]/div["+"]/div/";
+		String result="//*[@id=\"page-content\"]/div/div[2]/";
 		switch(op)
 		{
-			case 1: //XpathTipo
-				result += "div[1]/div/div/a";
+			case 1: //XpathTitle
+				result += "div[1]/div/div/div[2]/h1";
 				break;
-			case 2: //XpathTitle
-				result += "div[2]/div[1]/div[2]/span";
+			case 2: //XpathAutor
+				result += " div[2]/div[2]/div[1]/div[1]/div[4]/p[3]/a[1]";
 				break;
-			case 3: //XpathAutor
-				result += "div[2]/div[1]/div[1]/span";
+			case 3: //XpathDescripcion
+				result += "div[2]/div[2]/div[1]/div[1]/div[4]/p[8]/span";
 				break;
-			case 4: //XpathDescripcion
-				result += "div[2]/div[1]/a/img";
-			case 5: //XpathDemografia 
-				result += "div[1]/div/div/a";
+			case 4: //XpathDemografia 
+				result += "div[2]/div[2]/div[1]/div[1]/div[4]/p[2]/span[3]";
 				break;
-			case 6: //XpathEstadoManga
-				result += "div[2]/div[1]/div[1]/span";
+			case 5: //XpathEstadoManga
+				result += "div[2]/div[1]/div[1]/div/div[1]/div[1]/span";
 				break;
-			case 7: //XpathFechaPublicacion
-				result += "div[2]/div[1]/a/img";
-			case 8: //XpathPeridiocidadManga
-				result += "div[1]/div/div/a";
+			case 6: //XpathFechaPublicacion
+				result += "div[2]/div[2]/div[1]/div[1]/div[4]/p[2]/span[1]";
 				break;
-			case 9: //XpathUrlManga;
-				result += "div[2]/div[1]/div[2]/span";
+			case 7: //XpathPeridiocidadManga
+				result += "div[2]/div[2]/div[1]/div[1]/div[4]/p[2]/span[2]";
 				break;
-			case 10: //XpathUrlPortada
-				result += "div[2]/div[1]/div[1]/span";
-				break;
-			case 11: //XpathUrlRakingManga;
-				result += "div[2]/div[1]/div[2]/span";
-				break;
-			case 12: //XpathUrlRatingManga
-				result += "div[2]/div[1]/div[1]/span";
-				break;			
+			case 8: //XpathUrlRakingManga;
+				result += "div[2]/div[1]/div[1]/div/div[1]/div[2]/h4";
+				break;		
 		}
 		return result;
 	}
 	public String createXpathElementGenero(int i) {
-		String result="//*[@id=\"page-content\"]/div/div[2]/div[2]/div[2]/div[3]/div[3]/div[4]/div["+i+"]/";
+		String result="//*[@id=\"page-content\"]/div/div[2]/div[2]/div[2]/div[1]/div[1]/div[4]/p[7]/a["+i+"]";
 		return result;
 	}	
 	public String createXpathElementCap(int i,int op) {
@@ -194,245 +165,310 @@ public class WebContentMangaTmo {
 	}
 	
 	//Ordena la lista de mangas desde los recien publicados hasta a las entradas mas antiguas
-	public void goFinalCarrusel() {
+	public boolean goFinalCarrusel() {
 		String xPathButton = "//*[@id=\"page-content\"]/div/div[2]/div[2]/div[2]/div[3]/div[3]/div[4]/div[26]/ul/li[10]/a";
-		while(true) 
+		int error=0;
+		while(true) //Falta validar que no siempre exisitara el carrusel
 		{
 			if(existsElement(xPathButton))
 			{
 				WebElement e= driver.findElement(By.xpath(xPathButton));
 				e.click();
-				break;
+				return true;
 			}
-			support.sleep(2);
+			else 
+			{	
+				error++;
+				if(error==5)
+				{	
+					return false;
+				}
+				support.sleep(2);
+			}
 		}		
 	}
-	/*
-	private void insertContentManga(StatusManga reqStatus) {
-		//Testing metodo POST con retrofit
-		Call<StatusManga> statusMangaCallPost = webServiceTmo.setStatusManga(reqStatus);
-		statusMangaCallPost.enqueue(new Callback<StatusManga>(){
-			public void onFailure(Call<StatusManga> call, Throwable t) {
+	
+	private void getListStatusManga() {
+		errorGetListStatusManga=0;
+		listStatusMangaResponse=null;
+		Call<List<StatusManga> > statusMangaCallPost = webServiceTmo.getStatusMangas();
+		statusMangaCallPost.enqueue(new Callback<List<StatusManga> >(){
+			public void onFailure(Call<List<StatusManga> > call, Throwable t) {
 				// TODO Auto-generated method stub
+				errorGetListStatusManga=1;
 				System.out.println("error al consumir la api");
 			}
-			public void onResponse(Call<StatusManga> call, Response<StatusManga> response) {
-				// TODO Auto-generated method stub
-					System.out.println("INSERT CORRECT!!");	
+			public void onResponse(Call<List<StatusManga> > call, Response<List<StatusManga> > response) {
+				listStatusMangaResponse=new ArrayList<StatusManga>();
+				listStatusMangaResponse = response.body();
+				
+				System.out.println("CONSULT QUERY CORRECT!!!");	
 			}
 		});		
-	}*/
-	public String validateText(String text) {
-		String result="";
-		int size = text.length();
-		for(int i=0;i<size;i++)
-		{
-			char c=text.charAt(i);
-			if(c=='\"')
-				result+="\\\"";
-			else
-				result+=c;
-		}			
-		return result;
 	}
 	public void getContentsMangas() {
-
-		////Acepta la cokies de la web
-        acceptCookies();
-        ContentManga contentManga = new ContentManga();  
-        System.out.println("Empieza la recoleccion de generos");    
-		int lastG = 60;    
-		for(int i = 1;i<=30 ; i++) {	// 30 generos porsiacaso :u	
-
-			String xPathGenero =   createXpathElementGenero(i);
-			for(int k=1;k<=10;k++)//Si el contenido solicitado no carga entonces lo vuelve a intentar hasta 'n' veces (n=10)
-			{
-				try {
-						WebElement eGenero = driver.findElement(By.xpath(xPathGenero));
-
-						String genero = validateText(eGenero.getText());	
-
-						support.sleep(0.4);
-						//System.out.println("\nNroCap: "+nroCap+"\nDescripcionCap: "+descripcionCap);	
-						if(genero!="")
-						{
-							contentManga.addGenero(genero);
-							System.out.println("\nGenero: "+genero);	
-							//contentManga.printCapitulosManga();
-							break;
-						}
-						else
-						{
-							System.out.println("\n         REPITIENDO LECTURA...");
-							support.sleep(2);	
-						}
-					}
-					catch(NoSuchElementException e) {
-						if(k==10){
-							System.out.println("Revisa la pagina tumangaonline.com por posibles problemas externos");
-							lastG=i;
-						}
-						System.out.println("error: "+k+" ---" +e);
-
-						support.sleep(2);
-					}
-			}
-			if(lastG != 30)
-				break;
-		}	
-		System.out.println("Verificacion de generoValidado");
-		if(contentManga.isExistBanGeneros()) {
-			//Actualizar es status a 'ban' en la tabla de StatusMangas
-		}
-		else if(contentManga.isExistGeneroGenderBender()){
-			//Actualizar es status a 'investigar' en la tabla de StatusMangas
-		}
-		else // Todo salio bien
-		{	
-	        System.out.println("Empieza la recoleccion de informacion primaria");
-			int umbralErrMaxText = 0;
-			String XpathTipo =  createXpathElement(1);
-			String XpathTitle =  createXpathElement(2);
-			String XpathAutor =  createXpathElement(3);
-			String XpathDescripcion =  createXpathElement(4);
-			String XpathDemografia =  createXpathElement(5);
-			String XpathEstadoManga =  createXpathElement(6);
-			String XpathFechaPublicacion =  createXpathElement(7);
-			String XpathPeridiocidadManga =  createXpathElement(8);
-			String XpathUrlManga =  createXpathElement(9);
-			String XpathUrlPortada =  createXpathElement(10);
-			String XpathUrlRakingManga =  createXpathElement(11);
-			String XpathUrlRatingManga =  createXpathElement(12);
-			for(int k=1;k<=10;k++)//Si el contenido solicitado no carga entonces lo vuelve a intentar hasta 'n' veces (n=10)
-			{
-				try {
-					
-						WebElement eTipo = driver.findElement(By.xpath(XpathTipo));	
-						WebElement eTitle =  driver.findElement(By.xpath(XpathTitle));	
-						WebElement eAutor =  driver.findElement(By.xpath(XpathAutor));	
-						WebElement eDescripcion =  driver.findElement(By.xpath(XpathDescripcion));	
-						WebElement eDemografia =  driver.findElement(By.xpath(XpathDemografia));	
-						WebElement eEstadoManga =  driver.findElement(By.xpath(XpathEstadoManga));	
-						WebElement eFechaPublicacion =  driver.findElement(By.xpath(XpathFechaPublicacion));	
-						WebElement ePeridiocidadManga =  driver.findElement(By.xpath(XpathPeridiocidadManga));	
-						WebElement eUrlManga =  driver.findElement(By.xpath(XpathUrlManga));	
-						WebElement eUrlPortada =  driver.findElement(By.xpath(XpathUrlPortada));	
-						WebElement eRakingManga =  driver.findElement(By.xpath(XpathUrlRakingManga));	
-						WebElement eRatingManga =  driver.findElement(By.xpath(XpathUrlRatingManga));	
-	
-						
-						String tipo = eTipo.getText();
-						String title = validateText(eTitle.getText());	
-						String autor = "";	
-						String descripcion ;	
-						String demografia ;	
-						String estadoManga ;	
-						String fechaPublicacion ;	
-						String peridiocidadManga ;	
-						String urlManga = eTitle.getAttribute("href");;	
-						String urlPortada = "" ;	
-						String rakingManga = eRakingManga.getText();	
-						String ratingManga = eRatingManga.getText();	
-	
-						String keyManga=(urlManga.substring(41,urlManga.length())).replace('/', '_');
-						String mas18 = "no";
-	
-						if(isMas18(title)) //Verifica si el contenido es +18
-						{
-							mas18 = "si";
-							title = title.substring(4,title.length());
-						}				
-						support.sleep(0.4);
-	
-						if(title!="" && autor!="" && (urlPortada!=null || urlPortada!="") )
-							break;
-						else
-						{
-							System.out.println("\n         REPITIENDO LECTURA...");
-							support.sleep(2);	
-						}
-					}
-					catch(NoSuchElementException e) {
-						System.out.println("error: "+ e);
-						umbralErrMaxText++;
-						support.sleep(2);
-						if(k==10)
-							System.out.println("Necesita revisar los servicios web");
-					}
-				if(umbralErrMaxText>=30)
+		int stop=0;
+		//Se intenta 5 veces la comunicacion con la api si hubiera un error,
+		for(int n=0;n<5 && stop==0 ;n++)//Para descartar problemas de red
+		{
+			getListStatusManga();
+			int t=0;
+			while(true) { //Bucle para depurar respuesta de la api
+				if(errorGetListStatusManga==1)//Hubo un error con la api
 				{
-					System.out.println("Revisa la pagina tumangaonline.com por posibles problemas externos");
+					System.out.println("ERROR AL CONSUMIR LA API");
 					break;
 				}
-			}
-	        System.out.println("Informacion obtenida");
-			System.out.println("Empieza el bucle para recorrer el carrusel de capitulos");
-			
-			//Nos posicionamos al final del carrusel
-			goFinalCarrusel();
-			System.out.println("Empezamos desde el final del carrusel");
-			while(true){
-				//Code
-				System.out.println("Inicio ListCarrusel");
-				int umbralErrMax = 0;
-				int last = 26;
-				for(int i = 1;i<=25 ; i++) {		
-					//Titulo y urlManga
-					String xPathNroCap =    createXpathElementCap(i,1);
-					String xPathTDescripcionCap =  createXpathElementCap(i,2);
+				else if(listStatusMangaResponse==null)//La respuesta no llega todavia pero no hay error con la api
+				{			
+					support.sleep(0.2);//Se espera 0.5 segundos
+					System.out.println("ESPERANDO RESPUESTA...........   "+(t*0.2)+ "   SEGUNDOS");
+					t++;
+				}
+				else //La respuesta fue recibida correctamente
+				{
+					boolean firstManga = true;
+					for(StatusManga sm : listStatusMangaResponse) {
+						String urlManga = sm.getUrlManga();
+						driver.navigate().to(urlManga);
+						ContentManga contentManga = new ContentManga();  
+				        System.out.println("Empieza la recoleccion de generos");    
+						int lastG = 30;    
+						for(int i = 1;i<=30 ; i++) {	// 30 generos porsiacaso :u	
+
+							String xPathGenero =   createXpathElementGenero(i);
+							for(int k=1;k<=5;k++)//Si el contenido solicitado no carga entonces lo vuelve a intentar hasta 'n' veces (n=10)
+							{
+								try {
+										WebElement eGenero = driver.findElement(By.xpath(xPathGenero));
+
+										String genero = support.validateText(eGenero.getText());		
+										support.sleep(0.4);
+										//System.out.println("\nNroCap: "+nroCap+"\nDescripcionCap: "+descripcionCap);	
+										if(genero!="" && !genero.contains("genero"))
+										{
+											contentManga.addGenero(genero);
+											System.out.println("\nGenero: "+genero);	
+											//contentManga.printCapitulosManga();
+											break;
+										}
+										else if(genero==""&&i>1)
+										{
+											lastG=i;
+											break;
+										}
+										else
+										{
+											System.out.println("\n         REPITIENDO LECTURA...");
+											support.sleep(2);	
+										}
+									}
+									catch(NoSuchElementException e) {
+										if(k==10){
+											System.out.println("Revisa la pagina tumangaonline.com por posibles problemas externos");
+											lastG=i;
+										}
+										System.out.println("error: "+k+" ---" +e);
+
+										support.sleep(2);
+									}
+							}
+							if(lastG != 30)
+								break;
+						}	
+						System.out.println("Verificacion de generoValidado");
+						//contentManga.printGenerosManga();
+						if(contentManga.isExistBanGeneros()) {
+							System.out.println("Te cayo el BANKAI (Ban Total)");
+							//Actualizar revision de StatusManga a 'si' y status a 'banTotal'
+						}
+						else if(contentManga.isExistGeneroGenderBender()){
+							System.out.println("Te caera el BANKAI, talvez (Ban parcial)");
+							//Actualizar revision de StatusManga a 'si' y status a 'banParcial'
+						}
+						else // Todo salio bien
+						{	
+							//Dejar revision en 'no' y actualizar  status a 'ok'
+							System.out.println("Todo bien joven continue");
+							
+					        System.out.println("Empieza la recoleccion de informacion primaria");
+							int umbralErrMaxText = 0;
 	
-				        
-					for(int k=1;k<=10;k++)//Si el contenido solicitado no carga entonces lo vuelve a intentar hasta 'n' veces (n=10)
-					{
-						try {
-								WebElement eNroCap = driver.findElement(By.xpath(xPathNroCap));
-								WebElement eDescripcionCap = driver.findElement(By.xpath(xPathTDescripcionCap));	
-								
-	
-								String nroCap = validateText(eNroCap.getText());	
-								nroCap = support.matchString("[0-9]+.[0-9][0-9]", nroCap);
-								
-								String descripcionCap = validateText(eDescripcionCap.getText());
-	
-								support.sleep(0.4);
-								//System.out.println("\nNroCap: "+nroCap+"\nDescripcionCap: "+descripcionCap);	
-								if(nroCap!="")
+							//Estos elementos se obtienen de los objetos recuperados StatusManga
+							String keyManga = sm.getKeyManga();
+							String tipoManga = sm.getTipoManga();
+							String urlPortada = sm.getUrlPortada();
+							String ratingManga = sm.getRatingManga();
+							String mas18 = sm.getEsMas18();		
+							
+							//Estos elementos se obtienen de la pagina web
+							String XpathTitle =  createXpathElement(1);
+							String XpathAutor =  createXpathElement(2);
+							String XpathDescripcion =  createXpathElement(3);
+							String XpathDemografia =  createXpathElement(4);
+							String XpathEstadoManga =  createXpathElement(5);
+							String XpathFechaPublicacion =  createXpathElement(6);
+							String XpathPeridiocidadManga =  createXpathElement(7);
+							String XpathRakingManga =  createXpathElement(8);
+							for(int k=1;k<=10;k++)//Si el contenido solicitado no carga entonces lo vuelve a intentar hasta 'n' veces (n=10)
+							{
+								try {
+									
+										WebElement eTitle =  driver.findElement(By.xpath(XpathTitle));	
+										WebElement eAutor =  driver.findElement(By.xpath(XpathAutor));	
+										WebElement eDescripcion =  driver.findElement(By.xpath(XpathDescripcion));	
+										WebElement eDemografia =  driver.findElement(By.xpath(XpathDemografia));	
+										WebElement eEstadoManga =  driver.findElement(By.xpath(XpathEstadoManga));	
+										WebElement eFechaPublicacion =  driver.findElement(By.xpath(XpathFechaPublicacion));	
+										WebElement ePeridiocidadManga =  driver.findElement(By.xpath(XpathPeridiocidadManga));	
+										WebElement eRakingManga =  driver.findElement(By.xpath(XpathRakingManga));	
+					
+										
+
+										String title = support.validateText(eTitle.getText());	
+										String autor = eAutor.getText();	
+										String descripcion = support.validateText(eDescripcion.getText());	
+										String demografia = eDemografia.getText() ;	
+										String estadoManga = eEstadoManga.getAttribute("uib-tooltip");	
+										String fechaPublicacion = eFechaPublicacion.getText();	
+										String peridiocidadManga =ePeridiocidadManga.getText();	
+										String rakingManga = eRakingManga.getText();					
+
+										support.sleep(0.4);
+					
+										if(title!="" && autor!="" )
+										{
+											rakingManga = rakingManga.substring(10,rakingManga.length());
+											contentManga.setMangaKey(keyManga);
+											contentManga.setTipoManga(tipoManga);
+											contentManga.setWebManga("tumangaonline");
+											contentManga.setTituloManga(title);
+											contentManga.setAutorManga(autor);
+											contentManga.setDescripcionManga(descripcion);
+											contentManga.addGenero(demografia);
+											contentManga.setEstadoManga(estadoManga);
+											contentManga.setFechaPublicacion(fechaPublicacion);
+											contentManga.setPeridiocidad(peridiocidadManga);
+											contentManga.setUrlManga(urlManga);
+											contentManga.setUrlPortada(urlPortada);
+											contentManga.setRakingManga(rakingManga);
+											contentManga.setRatingManga(ratingManga);
+											contentManga.setEsMas18(mas18);
+											/*System.out.println("\nTitulo: "+ title+
+																"\nAutor: "+ autor+
+																"\nDescripcion: "+ descripcion+
+																"\nDemografia: "+ demografia+
+																"\nEstadoManga: "+ estadoManga+
+																"\nFechaPublicacion: "+ fechaPublicacion+
+																"\nPeridiocidadManga: "+ peridiocidadManga+
+																"\nRakingManga: "+ rakingManga+
+																"\nurlManga: "+ urlManga+"\n");
+											contentManga.printGenerosManga();*/
+											break;
+										}
+										else
+										{
+											System.out.println("\n         REPITIENDO LECTURA...");
+											support.sleep(2);	
+										}
+									}
+									catch(NoSuchElementException e) {
+										System.out.println("error: "+ e);
+										umbralErrMaxText++;
+										support.sleep(2);
+										if(k==10)
+											System.out.println("Necesita revisar los servicios web");
+									}
+								if(umbralErrMaxText>=30)
 								{
-									Double orderCap = Double.parseDouble(nroCap);
-									contentManga.addCapitulo(new Capitulo(orderCap,nroCap,descripcionCap));
-									System.out.println("\nNroCap: "+orderCap+"\nDescripcionCap: "+descripcionCap);	
-									//contentManga.printCapitulosManga();
+									System.out.println("Revisa la pagina tumangaonline.com por posibles problemas externos");
 									break;
 								}
+							}
+					        System.out.println("Informacion obtenida");
+							System.out.println("Empieza el bucle para recorrer el carrusel de capitulos");
+							
+							//Nos posicionamos al final del carrusel
+							boolean isExistCarrusel = goFinalCarrusel();
+							System.out.println("Empezamos desde el final del carrusel");
+							while(true){
+								//Code
+								System.out.println("Inicio ListCarrusel");
+								int umbralErrMax = 0;
+								int last = 26;
+								for(int i = 1;i<=25 ; i++) {		
+									//Titulo y urlManga
+									String xPathNroCap =    createXpathElementCap(i,1);
+									String xPathTDescripcionCap =  createXpathElementCap(i,2);
+					
+								        
+									for(int k=1;k<=10;k++)//Si el contenido solicitado no carga entonces lo vuelve a intentar hasta 'n' veces (n=10)
+									{
+										try {
+												WebElement eNroCap = driver.findElement(By.xpath(xPathNroCap));
+												WebElement eDescripcionCap = driver.findElement(By.xpath(xPathTDescripcionCap));	
+												
+					
+												String nroCap = support.validateText(eNroCap.getText());	
+												nroCap = support.matchString("[0-9]+.[0-9][0-9]", nroCap);
+												
+												String descripcionCap = support.validateText(eDescripcionCap.getText());
+					
+												support.sleep(0.4);
+												//System.out.println("\nNroCap: "+nroCap+"\nDescripcionCap: "+descripcionCap);	
+												if(nroCap!="")
+												{
+													Double orderCap = Double.parseDouble(nroCap);
+													contentManga.addCapitulo(new Capitulo(orderCap,nroCap,descripcionCap));
+													System.out.println("\nNroCap: "+orderCap+"\nDescripcionCap: "+descripcionCap);	
+													//contentManga.printCapitulosManga();
+													break;
+												}
+												else
+												{
+													System.out.println("\n         REPITIENDO LECTURA...");
+													support.sleep(2);	
+												}
+											}
+											catch(NoSuchElementException e) {
+												if(k==10){
+													System.out.println("Revisa la pagina tumangaonline.com por posibles problemas externos");
+													last=i;
+												}
+												System.out.println("error: "+k+" ---" +e);
+												umbralErrMax++;
+												support.sleep(2);
+											}
+									}
+									if(umbralErrMax>=30 || last !=26)
+										break;
+								}		
+								//contentManga.printCapitulosManga();
+								contentManga.printContentManga();
+								System.out.println("Fin ListCarrusel");
+								if(isEnableNextButtonCarrusel(last) && isExistCarrusel)
+									goNextItemCarrusel(last);
 								else
-								{
-									System.out.println("\n         REPITIENDO LECTURA...");
-									support.sleep(2);	
-								}
+									break;
+								support.sleep(8);
 							}
-							catch(NoSuchElementException e) {
-								if(k==10){
-									System.out.println("Revisa la pagina tumangaonline.com por posibles problemas externos");
-									last=i;
-								}
-								System.out.println("error: "+k+" ---" +e);
-								umbralErrMax++;
-								support.sleep(2);
-							}
+						}
+						if(firstManga)
+						{
+							//Acepta la cokies de la web
+							acceptCookies();
+							firstManga = false;
+						}
 					}
-					if(umbralErrMax>=30 || last !=26)
-						break;
-				}		
-				contentManga.printCapitulosManga();
-				System.out.println("Fin ListCarrusel");
-				if(isEnableNextButtonCarrusel(last))
-					goNextItemCarrusel(last);
-				else
+					stop=1;
 					break;
-				support.sleep(8);
+				}				
 			}
 		}
-		closeContentManga();
+		//closeContentManga();
+		//driver.get("https://www.tumangaonline.com/biblioteca/mangas/45/One-Piece");
+		//driver.navigate().to("https://www.tumangaonline.com/biblioteca/mangas/45/One-Piece");
+		 System.out.println("Acabo todoooooooooo");
 		//apagarPC();
 		
 	}
