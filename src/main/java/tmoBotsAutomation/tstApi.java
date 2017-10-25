@@ -1,5 +1,6 @@
 package tmoBotsAutomation;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 //import java.util.ArrayList;
 import java.util.List;
@@ -127,18 +128,42 @@ public class tstApi {
 				"5","tumangaonline","manga","BEARĀ NO MICHI - ベアラーの道","El papu","holi",li,lc,"emision",
 				"12-08-2015","mensual","http://xdxd.com","http://xdxd.com","79","8.5","no");
 		System.out.println(gson.toJson(reqStatus));	*/
-		StatusManga status = new StatusManga("1","no","manga","one piece","xd0","xd","8.5","no","ok","1");;
-		Call<StatusManga> statusMangaCallPost = webServiceTmo.setStatusManga(status);
-		statusMangaCallPost.enqueue(new Callback<StatusManga>(){
-			public void onFailure(Call<StatusManga> call, Throwable t) {
+		DataManga dm =new DataManga("importBibliotecaStatus","Finish");
+		//StatusManga status = new StatusManga("1","no","manga","one piece","xd0","xd","8.5","no","ok","1");;
+		//Call<DataManga> statusMangaCallPost = webServiceTmo.setDataValue(dm);
+		/*statusMangaCallPost.enqueue(new Callback<DataManga>(){
+			public void onFailure(Call<DataManga> call, Throwable t) {
 				// TODO Auto-generated method stub
 				System.out.println("error al consumir la api" + t );
 			}
-			public void onResponse(Call<StatusManga> call, Response<StatusManga> response) {
+			public void onResponse(Call<DataManga> call, Response<DataManga> response) {
 				// TODO Auto-generated method stub
 					System.out.println("Testing completo");	
 			}
 		});	
+		Call<StatusManga> statusMangaCallPost = webServiceTmo.getItemStatusManga(keyManga);
+		/*statusMangaCallPost.enqueue(new Callback<StatusManga>(){
+			public void onFailure(Call<StatusManga> call, Throwable t) {
+				// TODO Auto-generated method stub
+				System.out.println("error al consumir la api");
+			}
+			public void onResponse(Call<StatusManga> call, Response<StatusManga> response) {
+				// TODO Auto-generated method stub
+					System.out.println("INSERT CORRECT!!");	
+			}
+		});	*/
+		Call<List<StatusManga>> statusMangaCallPost = webServiceTmo.getPageStatusManga("250");
+		List<StatusManga> st =null;
+		try {
+			st = (statusMangaCallPost.execute()).body();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(st!=null)
+			System.out.println("No es null xD" );
+		else
+			System.out.println("Es null xD" );
 		System.out.println("FINAL POST REQUEST" );
 	}
 

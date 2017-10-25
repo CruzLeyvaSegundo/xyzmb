@@ -18,7 +18,7 @@ public class SupportMethods {
     {  
         int l = left, r = right;  
         int m =(left+right)/2;
-        Capitulo pivot = new Capitulo(caps.get(m).getOrderCap(),caps.get(m).getNroCap(),caps.get(m).getDescripcionCap());  
+        Capitulo pivot = new Capitulo(caps.get(m).getOrderCap(),caps.get(m).getNroCap(),caps.get(m).getDescripcionCap(),caps.get(m).getLectorCap(),caps.get(m).getIsRestaurado());  
         while (l <= r) 
         {        
             while (caps.get(l).getOrderCap() < pivot.getOrderCap())             
@@ -26,7 +26,7 @@ public class SupportMethods {
             while (caps.get(r).getOrderCap() > pivot.getOrderCap())
                     r--;
             if (l <= r) {  
-                    Capitulo tmp = new Capitulo(caps.get(l).getOrderCap(),caps.get(l).getNroCap(),caps.get(l).getDescripcionCap());    
+                    Capitulo tmp = new Capitulo(caps.get(l).getOrderCap(),caps.get(l).getNroCap(),caps.get(l).getDescripcionCap(),caps.get(l).getLectorCap(),caps.get(l).getIsRestaurado());    
                     /*System.out.println("Antes de todo: Stepp 1  con 'l': "+l+" y 'r': "+r+" \n");
                     for (Capitulo e : caps) { 
             			e.printCapitulo();
@@ -79,6 +79,30 @@ public class SupportMethods {
 	     else 
 	         return "";
 	}
+	public String deleteSpacios(String text) {
+	     Pattern p = Pattern.compile("[^\\s]+");
+	     Matcher m = p.matcher(text);   // get a matcher object
+	     String r="";
+		while (m.find()) 
+		{
+				//System.out.println("Found a " + m.group() + ".");	
+				r+=m.group()+" ";
+		}
+		return r.substring(0,r.length()-1);
+	}
+	public String generateTextSearch(String text,String textAux) {
+	     String textFinal= text + " " +textAux.replace(","," ");
+	     textFinal = textFinal.toLowerCase();
+	     Pattern p = Pattern.compile("[^\\s]+");
+	     Matcher m = p.matcher(textFinal);   // get a matcher object
+	     String r="";
+		while (m.find()) 
+		{
+				//System.out.println("Found a " + m.group() + ".");	
+				r+=m.group()+" ";
+		}
+		return r.substring(0,r.length()-1);
+	}
 	public void sleep(double timeS) {
 		int t=(int)(timeS*1000);
     	try {
@@ -90,6 +114,8 @@ public class SupportMethods {
 	}
 	public String validateText(String text) {
 		String result="";
+		if(text.length()==0 || text ==null)
+			return "-";
 		int size = text.length();
 		for(int i=0;i<size;i++)
 		{
@@ -98,16 +124,26 @@ public class SupportMethods {
 				result+="\\\"";
 			else if(c=='\'')
 				result+="\\\'";
-			else if(c=='á' || c=='à')
+			else if(c=='á' || c=='à' || c=='ä')
 				result+='a';
-			else if(c=='é' || c=='è')
+			else if(c=='é' || c=='è' || c=='ë')
 				result+='e';
-			else if(c=='í' || c=='ì')
+			else if(c=='í' || c=='ì' || c=='ï')
 				result+='i';
-			else if(c=='ó' || c=='ò')
+			else if(c=='ó' || c=='ò' || c=='ö')
 				result+='o';
-			else if(c=='ú' || c=='ù')		
+			else if(c=='ú' || c=='ù' || c=='ü')		
 				result+='u';
+			else if(c=='Á' || c=='À' || c=='Ä')
+				result+='A';
+			else if(c=='É' || c=='È' || c=='Ë')
+				result+='E';
+			else if(c=='Í' || c=='Ì' || c=='Ï')
+				result+='I';
+			else if(c=='Ó' || c=='Ò' || c=='Ö')
+				result+='O';
+			else if(c=='Ú' || c=='Ù' || c=='Ü')		
+				result+='U';			
 			else
 				result+=c;
 		}			

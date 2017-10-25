@@ -15,11 +15,13 @@ public class ContentManga {
 	private String webManga;
 	private String tipoManga;
 	private String tituloManga;//Dentro del titulo del manga no debe haber el caracter especial " sin s respectivo \ o sino acontecera error	
+	private String tituloAuxiliar;
 	private String autorManga;
 	private String descripcionManga;//Dentro de la descripcion del manga no debe haber el caracter especial " sin s respectivo \ o sino acontecera error														
 	private List<String> generos;     // Ejm descripcion:  "Hola mundo lool el : \"texto\" jajajaja"
 	//@SerializedName("capitulosManga")
 	private List<Capitulo> capitulosManga;
+	private int nroCaps;
 	private String estadoManga;
 	private String fechaPublicacion;
 	private String peridiocidadManga;
@@ -31,18 +33,20 @@ public class ContentManga {
 	
 	public ContentManga() {}
 	
-	public ContentManga(String keyManga, String webManga, String tipoManga, String tituloManga, String autor,
-			String descripcion, List<String> generos, List<Capitulo> caps, String estado, String fechaPublicacion,
+	public ContentManga(String keyManga, String webManga, String tipoManga, String tituloManga,String tituloAuxiliar ,String autor,
+			String descripcion, List<String> generos, List<Capitulo> caps,int nroCaps, String estado, String fechaPublicacion,
 			String peridiocidad, String urlManga, String urlPortada, String rakingManga, String ratingManga,
 			String esMas18) {
 		this.keyManga = keyManga;
 		this.webManga = webManga;
 		this.tipoManga = tipoManga;
 		this.tituloManga = tituloManga;
+		this.tituloAuxiliar = tituloAuxiliar;
 		this.autorManga = autor;
 		this.descripcionManga = descripcion;
 		this.generos = generos;
 		this.capitulosManga = caps;
+		this.nroCaps = nroCaps;
 		this.estadoManga = estado;
 		this.fechaPublicacion = fechaPublicacion;
 		this.peridiocidadManga = peridiocidad;
@@ -218,6 +222,7 @@ public class ContentManga {
 				"\nWebManga: "+this.getWebManga()+
 				"\nTipoManga: "+this.getTipoManga()+
 				"\nTituloManga: "+this.getTituloManga()+
+				"\nTituloAux: "+this.getTituloAuxiliar()+
 				"\nAutorManga: "+this.getAutorManga()+
 				"\nDescripcionManga: "+this.getDescripcionManga()+
 				this.getStringGenerosManga()+
@@ -286,4 +291,52 @@ public class ContentManga {
 		}
 		return false;
 	}	
+	public void restaurarCapsManga(){
+		SupportMethods support = new SupportMethods();
+		String nroCapPivote = getCaps().get(getCaps().size()-1).getNroCap();
+		String nroCapPivote2 = getCaps().get(0).getNroCap();
+		//System.out.println("Restaurando capitulos 0");
+		if(support.matchString("[0].[0-9][0-9]", nroCapPivote)=="")
+		{
+			//System.out.println("Restaurando capitulos 1");
+			if(support.matchString("[^0-9][0].[0-9][0-9]", nroCapPivote2)=="")
+			{
+				//System.out.println("Restaurando capitulos 2");
+				Double pivot = Double.parseDouble(nroCapPivote2);
+				for(int i = Integer.valueOf(pivot.intValue())-1;i>0;i--)
+				{
+					String nroCap = String.valueOf(i)+".00";
+					addCapitulo(new Capitulo(Double.valueOf(nroCap),nroCap,"-",new ArrayList<LectorCapitulo>(),"si"));
+					//this.printCapitulosManga();
+				}
+				
+			}	
+		}
+	}
+
+	public String getTituloAuxiliar() {
+		return tituloAuxiliar;
+	}
+
+	public void setTituloAuxiliar(String tituloAuxiliar) {
+		this.tituloAuxiliar = tituloAuxiliar;
+	}	
+	
+	public boolean validarContentManga() {
+		if(keyManga.length()!=0 && tituloManga.length()!=0 &&tituloAuxiliar.length()!=0 && autorManga.length()!=0&&
+				descripcionManga.length()!=0 && estadoManga.length()!=0 && fechaPublicacion.length()!=0&&
+				peridiocidadManga.length()!=0 && rakingManga.length()!=0 && ratingManga.length()!=0)
+			return true;
+		else {
+			return false;
+		}
+	}
+
+	public int getNroCaps() {
+		return nroCaps;
+	}
+
+	public void setNroCaps(int nroCaps) {
+		this.nroCaps = nroCaps;
+	}
 }

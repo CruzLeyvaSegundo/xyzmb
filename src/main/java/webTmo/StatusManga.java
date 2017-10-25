@@ -6,26 +6,31 @@ public class StatusManga {
 	private String revisionManga;
 	private String tipoManga;
 	private String tituloManga;	
+	private String tituloAuxiliar;	
+	//private String tituloAlter;	
 	private String urlPortada;
 	private String urlManga;	
 	private String ratingManga;
 	private String esMas18;
 	private String statusManga;
 	private String page;
+	private String textSearch; //facilitara la busqueda uniendo el titulo y el tituloAux en un solo string , buscar contains()
 	public StatusManga() {}
 
-	public StatusManga(String keyManga, String revisionManga, String tipoManga, String tituloManga, String urlPortada,
-			String urlManga, String ratingManga, String esMas18, String statusManga, String page) {
+	public StatusManga(String keyManga, String revisionManga, String tipoManga, String tituloManga,String tituloAuxiliar, String urlPortada,
+			String urlManga, String ratingManga, String esMas18, String statusManga, String page,String textSearch) {
 		this.keyManga = keyManga;
 		this.revisionManga = revisionManga;
 		this.tipoManga = tipoManga;
 		this.tituloManga = tituloManga;
+		this.tituloAuxiliar = tituloAuxiliar;
 		this.urlPortada = urlPortada;
 		this.urlManga = urlManga;
 		this.ratingManga = ratingManga;
 		this.esMas18 = esMas18;
 		this.statusManga = statusManga;
 		this.page = page;
+		this.setTextSearch(textSearch);
 	}
 	
 	public String getKeyManga() {
@@ -133,5 +138,21 @@ public class StatusManga {
 
 	public void setPage(String page) {
 		this.page = page;
+	}
+
+	public String getTituloAuxiliar() {
+		return tituloAuxiliar;
+	}
+
+	public void setTituloAuxiliar(String tituloAuxiliar) {
+		this.tituloAuxiliar = tituloAuxiliar;
+	}
+
+	public String getTextSearch() {
+		return textSearch;
+	}
+
+	public void setTextSearch(String textSearch) {
+		this.textSearch = textSearch;
 	}
 }

@@ -32,7 +32,7 @@ public class WebBibliotecaTmo {
 	private Retrofit retrofit;
 	private WebServicesTmo webServiceTmo;
 	private SupportMethods support;
-	
+	private int errorData=0;
 	public WebBibliotecaTmo() {
 		// Se instancia la ubicacion de geckodriver
 		System.setProperty("webdriver.gecko.driver", "browsers//geckodriver.exe");
@@ -111,7 +111,7 @@ public class WebBibliotecaTmo {
 					return true;
 				}
 			}
-			sleep(2);
+			sleep(3);
 		}		
 	}
 	
@@ -162,7 +162,7 @@ public class WebBibliotecaTmo {
 	public void orderBibliotecaManga() {
         Select dropdown = new Select(driver.findElement(By.xpath("//*[@id=\"page-content\"]/div/div[2]/div[2]/div[2]/div[1]/div/div/div/select")));
         dropdown.selectByValue("fechaCreacion");
-        driver.findElement(By.xpath("//*[@id=\"page-content\"]/div/div[2]/div[2]/div[2]/div[1]/div/div/div/span/button")).click();
+        //driver.findElement(By.xpath("//*[@id=\"page-content\"]/div/div[2]/div[2]/div[2]/div[1]/div/div/div/span/button")).click();
         sleep(5);
 	}
 	private void insertStatusManga(StatusManga reqStatus) {
@@ -178,6 +178,21 @@ public class WebBibliotecaTmo {
 					System.out.println("INSERT CORRECT!!");	
 			}
 		});		
+	}
+	private StatusManga getStatusMangaItem(String keyManga) {
+		//Testing metodo POST con retrofit
+		Call<StatusManga> statusMangaCallPost = webServiceTmo.getItemStatusManga(keyManga);
+		StatusManga st =null;
+		try {
+			st = (statusMangaCallPost.execute()).body();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(!st.isNull())
+			return st;
+		else
+			return null;
 	}
 	private void insertDataValue(DataManga reqStatus) {
 		//Testing metodo POST con retrofit
@@ -212,7 +227,7 @@ public class WebBibliotecaTmo {
 				String xPathRating =  createXpathElement(i,3);
 				String xPathPortada = createXpathElement(i,4);
 		        
-				for(int k=1;k<=10;k++)//Si el contenido solicitado no carga entonces lo vuelve a intentar hasta 'n' veces (n=10)
+				for(int k=1;k<=15;k++)//Si el contenido solicitado no carga entonces lo vuelve a intentar hasta 'n' veces (n=10)
 				{
 					try {
 						WebElement eTitle = driver.findElement(By.xpath(xPathTittle));	
@@ -220,7 +235,7 @@ public class WebBibliotecaTmo {
 						WebElement eRating = driver.findElement(By.xpath(xPathRating));
 						WebElement ePortada = driver.findElement(By.xpath(xPathPortada));
 						
-						String title = support.validateText(eTitle.getText()).toLowerCase();
+						String title = support.validateText(eTitle.getText().toLowerCase());
 						String urlManga = eTitle.getAttribute("href");
 						String keyManga=(urlManga.substring(41,urlManga.length())).replace('/', '_').toLowerCase();
 						String tipo = eTipo.getText();
@@ -235,19 +250,29 @@ public class WebBibliotecaTmo {
 							title = title.substring(4,title.length());
 						}				
 						sleep(0.4);
-						StatusManga statusManga = new StatusManga(keyManga,"no",tipo,title,portada,
-																	urlManga,rating,mas18,"-",String.valueOf(page));
-						if((portada!=null || portada!="") && (title!=null || title !="") && (tipo!=null || tipo!="")
-								&&!(keyManga.contains("manga.nombreUrl%7D%7D")||tipo.contains("manga.tipo")))
+						StatusManga statusManga = new StatusManga(keyManga,"no",tipo,title,"",portada,
+																	urlManga,rating,mas18,"-",String.valueOf(page),"");
+						//statusManga.printStatusManga();	
+						if((portada!=null && portada!="") && (title!=null && title !="") && (tipo!=null && tipo!="")
+								&&!keyManga.contains("manga.nombreUrl")&&!tipo.contains("manga.tipo")
+								&&(keyManga!=""&&keyManga!=null))
 						{
-							statusManga.printStatusManga();
-							insertStatusManga(statusManga); 
+							StatusManga st = getStatusMangaItem(keyManga);
+							
+							if(st==null) {
+								insertStatusManga(statusManga); 	
+								statusManga.printStatusManga();		
+								errorData++;
+							}
+							else
+								System.out.println("\nObjeto ya insertado anteriormente...");
 							countMangasPage++;
 							nroMangas++;
 							if(countMangasPage==100) {
 								page++;
 								countMangasPage=0;
 							}
+							//support.sleep(1);
 							break;
 						}
 						else
@@ -260,14 +285,15 @@ public class WebBibliotecaTmo {
 						System.out.println("error: "+ e);
 						umbralErrMax++;
 						sleep(2);
-						if(k==10)
+						if(k==15)
 						{
-							insertDataValue(new DataManga("importBibliotecaStatus","error"));
+							insertDataValue(new DataManga("importBibliotecaExistError","error"));
 							System.out.println("Revisa la pagina tumangaonline.com por posibles problemas externos");
+							//errorData++;
 						}
 					}
 				}
-				if(umbralErrMax>=30)
+				if(umbralErrMax>=40)
 					break;
 			}
 			if(isEnableNextButtonCarrusel())
@@ -276,10 +302,12 @@ public class WebBibliotecaTmo {
 				break;
 			sleep(8);
 		}
+		System.out.println("Se acabo el carrusel");
 		//Insert DataSystem NroMangas
 		insertDataValue(new DataManga("nroMangasTmo",String.valueOf(nroMangas)));
 		insertDataValue(new DataManga("nroPaginasTmo",String.valueOf(page)));
 		insertDataValue(new DataManga("importBibliotecaStatus","Finish"));
+		insertDataValue(new DataManga("errorData",String.valueOf(errorData)));	
 		closeBiblioteca();
 		apagarPC();
 		

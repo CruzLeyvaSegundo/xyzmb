@@ -16,11 +16,11 @@ public class botTmoImportBiblioteca {
         System.out.println("Page title is: " + webBiblioteca.getTitle());
         
         //Se almacena el html de la pagina visitada en un archivo .txt
-        System.out.println("Guardando html en un archivo...");
+        /*System.out.println("Guardando html en un archivo...");
         String html = webBiblioteca.getHtmlContent();
         String ruta = "C:\\Users\\segun\\Desktop\\ListManganime\\prueba.txt";
         webBiblioteca.writeTextFile(html,ruta);
-        System.out.println("Html guardado!!");
+        System.out.println("Html guardado!!");*/
          
         //Se recorre el carrusel de los mangas publicados hasta la fecha dentro de la biblioteca
         System.out.println("Empieza el bucle para recorrer el carrusel");
