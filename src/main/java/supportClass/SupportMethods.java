@@ -121,9 +121,7 @@ public class SupportMethods {
 		{
 			char c=text.charAt(i);
 			if(c=='\"')
-				result+="\\\"";
-			else if(c=='\'')
-				result+="\\\'";
+				result+="\'";
 			else if(c=='á' || c=='à' || c=='ä')
 				result+='a';
 			else if(c=='é' || c=='è' || c=='ë')

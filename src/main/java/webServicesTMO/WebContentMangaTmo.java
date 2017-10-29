@@ -242,7 +242,7 @@ public class WebContentMangaTmo {
 	}
 	private void setStatusManga(StatusManga st) {
 		//Testing metodo POST con retrofit
-		Call<StatusManga> statusMangaCallPost = webServiceTmo.setStatusManga(st);
+		Call<String> statusMangaCallPost = webServiceTmo.setStatusManga(st);
 		try {
 			statusMangaCallPost.execute();
 			System.out.println("Insert statusManga correct");
@@ -284,13 +284,13 @@ public class WebContentMangaTmo {
 	
 	private void insertDataValue(DataManga reqStatus) {
 		//Testing metodo POST con retrofit
-		Call<DataManga> statusMangaCallPost = webServiceTmo.setDataValue(reqStatus);
-		statusMangaCallPost.enqueue(new Callback<DataManga>(){
-			public void onFailure(Call<DataManga> call, Throwable t) {
+		Call<String> statusMangaCallPost = webServiceTmo.setDataValue(reqStatus);
+		statusMangaCallPost.enqueue(new Callback<String>(){
+			public void onFailure(Call<String> call, Throwable t) {
 				// TODO Auto-generated method stub
 				System.out.println("error al consumir la api");
 			}
-			public void onResponse(Call<DataManga> call, Response<DataManga> response) {
+			public void onResponse(Call<String> call, Response<String> response) {
 				// TODO Auto-generated method stub
 					System.out.println("INSERT CORRECT!!");	
 			}
@@ -311,7 +311,7 @@ public class WebContentMangaTmo {
 	}
 	public void getContentsMangas() 
 	{
-		int page=40,pagesError=0,error1=0,insertCorrect=0,error2=0,mangasNoValidados=0,mangasBloquedado = 0,mangasValidados=0,mangasBanTotal=0,mangasBanParcial=0,mangasOk=0;
+		int page=118,pagesError=0,error1=0,insertCorrect=0,error2=0,mangasNoValidados=0,mangasBloquedado = 0,mangasValidados=0,mangasBanTotal=0,mangasBanParcial=0,mangasOk=0;
 		boolean firstManga = true;
 		List<StatusManga>  listStatusMangaResponse = new ArrayList<StatusManga>();
 		while(true)
@@ -321,7 +321,10 @@ public class WebContentMangaTmo {
 			page++;
 			//System.out.println("Page : "+page);   
 			if(listStatusMangaResponse.size() == 0)
+			{
+				System.out.println("finishhh"); 
 				break;
+			}
 			if(listStatusMangaResponse.size()<90)
 				pagesError++;
 			for(StatusManga sm : listStatusMangaResponse) 
@@ -597,7 +600,7 @@ public class WebContentMangaTmo {
 					}
 				}
 			}	  
-		}
+		}/*
 		insertDataValue(new DataManga("ErroresDesconocidos",String.valueOf(error1)));
 		support.sleep(4);
 		insertDataValue(new DataManga("erroresValidarDatos",String.valueOf(error2)));
@@ -616,7 +619,7 @@ public class WebContentMangaTmo {
 		support.sleep(4);
 		insertDataValue(new DataManga("insertCorrect",String.valueOf(insertCorrect)));
 		support.sleep(4);
-		insertDataValue(new DataManga("pagesError",String.valueOf(pagesError)));
+		insertDataValue(new DataManga("pagesError",String.valueOf(pagesError)));*/
 		//closeContentManga();
 		//driver.get("https://www.tumangaonline.com/biblioteca/mangas/45/One-Piece");
 		//driver.navigate().to("https://www.tumangaonline.com/biblioteca/mangas/45/One-Piece");

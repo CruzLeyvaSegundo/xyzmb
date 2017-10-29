@@ -167,13 +167,13 @@ public class WebBibliotecaTmo {
 	}
 	private void insertStatusManga(StatusManga reqStatus) {
 		//Testing metodo POST con retrofit
-		Call<StatusManga> statusMangaCallPost = webServiceTmo.setStatusManga(reqStatus);
-		statusMangaCallPost.enqueue(new Callback<StatusManga>(){
-			public void onFailure(Call<StatusManga> call, Throwable t) {
+		Call<String> statusMangaCallPost = webServiceTmo.setStatusManga(reqStatus);
+		statusMangaCallPost.enqueue(new Callback<String>(){
+			public void onFailure(Call<String> call, Throwable t) {
 				// TODO Auto-generated method stub
 				System.out.println("error al consumir la api");
 			}
-			public void onResponse(Call<StatusManga> call, Response<StatusManga> response) {
+			public void onResponse(Call<String> call, Response<String> response) {
 				// TODO Auto-generated method stub
 					System.out.println("INSERT CORRECT!!");	
 			}
@@ -196,13 +196,13 @@ public class WebBibliotecaTmo {
 	}
 	private void insertDataValue(DataManga reqStatus) {
 		//Testing metodo POST con retrofit
-		Call<DataManga> statusMangaCallPost = webServiceTmo.setDataValue(reqStatus);
-		statusMangaCallPost.enqueue(new Callback<DataManga>(){
-			public void onFailure(Call<DataManga> call, Throwable t) {
+		Call<String> statusMangaCallPost = webServiceTmo.setDataValue(reqStatus);
+		statusMangaCallPost.enqueue(new Callback<String>(){
+			public void onFailure(Call<String> call, Throwable t) {
 				// TODO Auto-generated method stub
 				System.out.println("error al consumir la api");
 			}
-			public void onResponse(Call<DataManga> call, Response<DataManga> response) {
+			public void onResponse(Call<String> call, Response<String> response) {
 				// TODO Auto-generated method stub
 					System.out.println("INSERT CORRECT!!");	
 			}

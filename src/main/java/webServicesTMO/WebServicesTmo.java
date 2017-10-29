@@ -14,6 +14,9 @@ import webTmo.StatusManga;
 public interface WebServicesTmo {
 	
 	//GET METHODS  -- Todos los metodos GET han sido testeados
+	@GET("data/{dataManga}")
+	Call<DataManga> getDataMangaItem(@Path("dataManga") String dataManga);
+	
 	@GET("tmostatus")
 	Call<List<StatusManga>> getStatusMangas();
 
@@ -31,14 +34,17 @@ public interface WebServicesTmo {
 	
 	//POST METHODS  ---- Todos los metodos POST han sido testeados
 	@POST("tmostatus")
-	Call<StatusManga> setStatusManga(@Body StatusManga request);
+	Call<String> setStatusManga(@Body StatusManga request);
 	
 	@POST("mangas")
 	Call<String> setContentManga(@Body ContentManga request);
 	
-	@POST("dataManga")
-	Call<DataManga> setDataValue(@Body DataManga request);
+	@POST("data")
+	Call<String> setDataValue(@Body DataManga request);
 	
 	@POST("generoManga")
 	Call<String> setGeneroManga(@Body GeneroManga request);
+	
+	@POST("updateManga")
+	Call<String> setUpdateManga(@Body UpdateManga request);
 }

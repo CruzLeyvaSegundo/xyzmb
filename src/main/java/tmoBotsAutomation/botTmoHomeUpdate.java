@@ -12,14 +12,14 @@ public class botTmoHomeUpdate {
         WebHomeTmo webHome = new WebHomeTmo();       
    
         // Comenta el titulo de la pagina visatada
-        System.out.println("Page title is: " + webHome.getTitle());
+       // System.out.println("Page title is: " + webHome.getTitle());
         
         //Se almacena el html de la pagina visitada en un archivo .txt
-        System.out.println("Guardando html en un archivo...");
+        /*System.out.println("Guardando html en un archivo...");
         String html = webHome.getHtmlContent();
         String ruta = "C:\\Users\\segun\\Desktop\\ListManganime\\prueba.txt";
         webHome.writeTextFile(html,ruta);
-        System.out.println("Html guardado!!");
+        System.out.println("Html guardado!!");*/
          
         //Se recorre el carrusel de los mangas publicados hasta la fecha dentro de la biblioteca
         System.out.println("Empieza el bucle para recorrer el carrusel");
